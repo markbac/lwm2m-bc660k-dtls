@@ -13,9 +13,12 @@ from db_manager import DBManager
 from xml_parser import LwM2MXMLParser
 from pylogkit import setup_logging
 
+__version__ = "1.2.0"
 LOG_FILE_PATH = os.path.join(os.path.dirname(__file__), "lwm2m_dtls.log")
 
 class LwM2MManager:
+    VERSION = __version__
+
     def __init__(self, file_logging_enabled: bool = True):
         self.ser: Optional[serial.Serial] = None
         self.port: Optional[str] = None
@@ -101,6 +104,16 @@ class LwM2MManager:
 
         self._notify("log", entry)
 
+    def _reclaim_port(self, port: str):
+        self.log(f"[WARNING] Port {port} is locked by another process! Attempting to free port handle (Tool v{self.VERSION})...", "WARNING")
+        try:
+            ps_script = f"Get-CimInstance Win32_Process | Where-Object {{ $_.ProcessId -ne {os.getpid()} -and ($_.Name -eq 'python.exe' -and $_.CommandLine -like '*server.py*') }} | Stop-Process -Force -ErrorAction SilentlyContinue"
+            cmd = f'powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "{ps_script}"'
+            subprocess.run(cmd, shell=True, timeout=5, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            time.sleep(0.8)
+        except Exception as e:
+            self.log(f"[RECLAIM ERROR] Could not terminate locking process: {e}", "ERROR")
+
     @staticmethod
     def get_ports() -> List[Dict[str, str]]:
         ports = serial.tools.list_ports.comports()
@@ -110,8 +123,16 @@ class LwM2MManager:
         self.disconnect()
         with self.lock:
             try:
-                self.log(f"[SERIAL] Connecting to {port} @ {baudrate} baud...", "INFO")
-                self.ser = serial.Serial(port, baudrate, timeout=1.5)
+                self.log(f"[SERIAL] Connecting to {port} @ {baudrate} baud (Tool v{self.VERSION})...", "INFO")
+                try:
+                    self.ser = serial.Serial(port, baudrate, timeout=1.5)
+                except serial.SerialException as e:
+                    if "PermissionError" in str(e) or "Access is denied" in str(e):
+                        self._reclaim_port(port)
+                        self.ser = serial.Serial(port, baudrate, timeout=1.5)
+                    else:
+                        raise e
+
                 self.port = port
                 self.baudrate = baudrate
                 self.is_connected = True
@@ -126,7 +147,7 @@ class LwM2MManager:
                 self._notify("state", self.state)
                 return True
             except Exception as e:
-                self.log(f"[ERROR] Could not open port {port}: {e}", "ERROR")
+                self.log(f"[ERROR] Could not open port {port} (Tool v{self.VERSION}): {e}", "ERROR")
                 self.disconnect()
                 return False
 

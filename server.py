@@ -224,7 +224,7 @@ if __name__ == "__main__":
     port_num = 8081  # Port 8081 for new LwM2M project
     url = f"http://localhost:{port_num}"
     print(f"\n=======================================================")
-    print(f"Quectel BC660K LwM2M DTLS Studio running at: {url}")
+    print(f"Quectel BC660K LwM2M DTLS Studio v{manager.VERSION} running at: {url}")
     print(f"Baud Rate: {args.baud}")
     print(f"Mode: {'SIMULATED DEMO (--demo)' if args.demo else 'REAL HARDWARE'}")
     print(f"Py-LogKit File Logging: {'ENABLED (lwm2m_dtls.log)' if not args.no_file_log else 'DISABLED'}")
