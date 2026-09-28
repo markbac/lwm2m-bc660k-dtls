@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
+  <Object ObjectType="MODefinition">
+    <Name>Custom Industrial Telemetry</Name>
+    <Description1>Custom Enterprise LwM2M Object for Industrial Monitoring over DTLS.</Description1>
+    <ObjectID>10241</ObjectID>
+    <ObjectURN>urn:custom:lwm2m:10241</ObjectURN>
+    <MultipleInstances>Multiple</MultipleInstances>
+    <Mandatory>Optional</Mandatory>
+    <Resources>
+      <Item ID="1">
+        <Name>Machine Vibration Level</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>Float</Type>
+        <Units>mm/s</Units>
+        <Description>Root Mean Square vibration velocity.</Description>
+      </Item>
+      <Item ID="2">
+        <Name>Hydraulic Pressure</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>Float</Type>
+        <Units>Bar</Units>
+        <Description>Current system hydraulic fluid pressure.</Description>
+      </Item>
+      <Item ID="3">
+        <Name>Emergency Stop Status</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>Boolean</Type>
+        <Description>Boolean flag for emergency safety relay status.</Description>
+      </Item>
+      <Item ID="4">
+        <Name>Device Error Code</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Optional</Mandatory>
+        <Type>Integer</Type>
+        <Description>Diagnostic error code bitmap.</Description>
+      </Item>
+    </Resources>
+  </Object>
+</LWM2M>

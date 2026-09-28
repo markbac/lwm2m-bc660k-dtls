@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
+  <Object ObjectType="MODefinition">
+    <Name>Temperature</Name>
+    <Description1>IPSO Temperature Sensor object.</Description1>
+    <ObjectID>3303</ObjectID>
+    <ObjectURN>urn:oma:lwm2m:ext:3303</ObjectURN>
+    <MultipleInstances>Multiple</MultipleInstances>
+    <Mandatory>Optional</Mandatory>
+    <Resources>
+      <Item ID="5700">
+        <Name>Sensor Value</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>Float</Type>
+        <Units>Cel</Units>
+        <Description>Current measured temperature in degrees Celsius.</Description>
+      </Item>
+      <Item ID="5601">
+        <Name>Min Measured Value</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Optional</Mandatory>
+        <Type>Float</Type>
+        <Units>Cel</Units>
+        <Description>Minimum value measured since reset.</Description>
+      </Item>
+      <Item ID="5602">
+        <Name>Max Measured Value</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Optional</Mandatory>
+        <Type>Float</Type>
+        <Units>Cel</Units>
+        <Description>Maximum value measured since reset.</Description>
+      </Item>
+      <Item ID="5701">
+        <Name>Sensor Unit</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Optional</Mandatory>
+        <Type>String</Type>
+        <Description>Measurement unit (e.g. Cel, Far, K).</Description>
+      </Item>
+    </Resources>
+  </Object>
+</LWM2M>

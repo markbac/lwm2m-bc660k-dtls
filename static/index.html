@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quectel BC660K LwM2M DTLS & Custom XML Studio</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="navbar">
+            <div class="brand">
+                <i class="fa-solid fa-shield-halved brand-icon"></i>
+                <div class="brand-text">
+                    <h1>Quectel BC660K LwM2M Studio</h1>
+                    <span class="subtitle">DTLS PSK Security & Custom OMA XML Object Manager</span>
+                </div>
+            </div>
+
+            <!-- Connection Control Bar -->
+            <div class="connection-bar">
+                <div class="control-group">
+                    <label for="portSelect"><i class="fa-solid fa-plug"></i> Port:</label>
+                    <select id="portSelect">
+                        <option value="">Scanning ports...</option>
+                    </select>
+                    <button id="refreshPortsBtn" class="btn btn-icon" title="Refresh Serial Ports">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <label for="baudSelect"><i class="fa-solid fa-gauge-high"></i> Baud:</label>
+                    <select id="baudSelect">
+                        <option value="115200" selected>115200 (Default)</option>
+                        <option value="9600">9600</option>
+                        <option value="57600">57600</option>
+                    </select>
+                </div>
+
+                <button id="connectBtn" class="btn btn-primary">
+                    <i class="fa-solid fa-link"></i> Connect
+                </button>
+
+                <button id="exitBtn" class="btn btn-danger-outline" title="Stop Server">
+                    <i class="fa-solid fa-power-off"></i> Exit
+                </button>
+
+                <div class="status-badge disconnected" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Disconnected</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Studio Grid -->
+        <main class="studio-grid">
+            <!-- Row 1: DTLS Security Config & LwM2M Registration -->
+            <section class="dtls-row">
+                <!-- DTLS PSK Security Configurator -->
+                <div class="card dtls-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-lock"></i> DTLS PSK Security Parameters</span>
+                        <span class="badge badge-warning" id="dtlsStatusBadge">Not Configured</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="dtlsServerInput">LwM2M Server Address & Port:</label>
+                                <div class="input-pair">
+                                    <input type="text" id="dtlsServerInput" placeholder="e.g. leshan.eclipseprojects.io" value="leshan.eclipseprojects.io">
+                                    <input type="number" id="dtlsPortInput" placeholder="5684" value="5684" style="max-width:100px;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="endpointInput">Client Endpoint Name:</label>
+                                <input type="text" id="endpointInput" placeholder="e.g. bc660k-node-01" value="bc660k-node-01" class="font-mono">
+                            </div>
+                            <div class="form-group">
+                                <label for="pskIdInput">PSK Identity (ID):</label>
+                                <input type="text" id="pskIdInput" placeholder="e.g. bc660k_identity" value="bc660k_identity" class="font-mono">
+                            </div>
+                            <div class="form-group">
+                                <label for="pskKeyInput">Pre-Shared Secret Key (PSK Hex/Key):</label>
+                                <input type="text" id="pskKeyInput" placeholder="e.g. 0102030405060708090a0b0c0d0e0f10" value="0102030405060708090a0b0c0d0e0f10" class="font-mono">
+                            </div>
+                        </div>
+                        <div class="dtls-actions mt-3">
+                            <button id="saveDtlsBtn" class="btn btn-primary">
+                                <i class="fa-solid fa-key"></i> Save DTLS Config (AT+QLWM2M="dtls")
+                            </button>
+                            <button id="registerBtn" class="btn btn-secondary">
+                                <i class="fa-solid fa-handshake"></i> Perform DTLS Register (AT+QLWM2M="register")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration State Card -->
+                <div class="card reg-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-server"></i> LwM2M Client Registration State</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Active Endpoint URN</span>
+                                <span class="info-val font-mono highlight" id="activeEpVal">bc660k-node-01</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Target LwM2M Server</span>
+                                <span class="info-val font-mono" id="activeServerVal">leshan.eclipseprojects.io:5684</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Registration Status</span>
+                                <span class="info-val" id="regStatusVal">Unregistered</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">DTLS Encryption</span>
+                                <span class="info-val text-success" id="dtlsModeVal">PSK (AES-128-CCM)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 2: OMA LwM2M Custom XML Object Importer -->
+            <section class="xml-row">
+                <div class="card xml-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-file-code"></i> Import Custom OMA LwM2M XML Object Definition</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="xml-import-grid">
+                            <div class="xml-upload-box">
+                                <label for="xmlFileInput" class="upload-dropzone">
+                                    <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                                    <span>Click or Drag & Drop OMA XML Object file (.xml)</span>
+                                    <small>Supports standard OMA LwM2M XML schemas (Objects 0..65535)</small>
+                                    <input type="file" id="xmlFileInput" accept=".xml">
+                                </label>
+                            </div>
+                            <div class="xml-paste-box">
+                                <label for="xmlPasteArea">Or Paste Raw XML Schema Definition:</label>
+                                <textarea id="xmlPasteArea" placeholder='<LWM2M><Object><Name>Custom Sensor</Name><ObjectID>10241</ObjectID>...</textarea>' class="font-mono"></textarea>
+                                <button id="importPasteBtn" class="btn btn-sm btn-secondary mt-2">
+                                    <i class="fa-solid fa-code"></i> Parse & Save XML Object
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 3: LwM2M Object Tree & Resource DTLS Notifier -->
+            <section class="objects-row">
+                <!-- Objects List -->
+                <div class="card objects-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-folder-tree"></i> Registered LwM2M Objects</span>
+                        <span class="badge badge-primary" id="objectCountBadge">0 Objects</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="objects-tree" id="objectsTree">
+                            <div class="empty-state">Loading LwM2M Object library...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Object Resource Tester -->
+                <div class="card resource-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-paper-plane"></i> Send DTLS Resource Notification (AT+QLWM2M="notify")</span>
+                        <span class="badge badge-good" id="selectedObjectBadge">Object 3303</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="resource-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="notifyObjId">Object ID:</label>
+                                    <input type="number" id="notifyObjId" value="3303" class="font-mono">
+                                </div>
+                                <div class="form-group">
+                                    <label for="notifyInstId">Instance ID:</label>
+                                    <input type="number" id="notifyInstId" value="0" class="font-mono">
+                                </div>
+                                <div class="form-group">
+                                    <label for="notifyResId">Resource ID:</label>
+                                    <input type="number" id="notifyResId" value="5700" class="font-mono">
+                                </div>
+                                <div class="form-group">
+                                    <label for="notifyType">Value Data Type:</label>
+                                    <select id="notifyType">
+                                        <option value="float" selected>Float (Decimal)</option>
+                                        <option value="string">String (Text)</option>
+                                        <option value="integer">Integer (Whole Number)</option>
+                                        <option value="boolean">Boolean (0/1)</option>
+                                        <option value="opaque">Opaque (Hex Bytes)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label for="notifyValue">Telemetry Value to Transmit over DTLS:</label>
+                                <div class="input-with-button">
+                                    <input type="text" id="notifyValue" placeholder="e.g. 24.5" value="24.5" class="font-mono">
+                                    <button id="sendNotifyBtn" class="btn btn-primary">
+                                        <i class="fa-solid fa-lock"></i> Transmit DTLS Notification
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 4: Sent Notifications Log & Serial Console -->
+            <section class="bottom-row">
+                <!-- DTLS Sent Notifications Table -->
+                <div class="card notif-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-list-check"></i> Transmitted DTLS Notifications</span>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Resource Path</th>
+                                    <th>Data Type</th>
+                                    <th>Value</th>
+                                    <th>DTLS Delivery</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notificationsTableBody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">No LwM2M notifications transmitted yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Py-LogKit AT Console -->
+                <div class="card terminal-card">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fa-solid fa-terminal"></i> Py-LogKit Serial Console</span>
+                        <div class="terminal-quick-cmds">
+                            <button class="cmd-btn" data-cmd="AT">AT</button>
+                            <button class="cmd-btn" data-cmd='AT+QLWM2M="select",1'>Select Stack</button>
+                            <button class="cmd-btn" data-cmd='AT+QLWM2M="register"'>Register</button>
+                            <button class="cmd-btn" data-cmd='AT+QLWM2M="update"'>Update</button>
+                            <button id="clearLogBtn" class="btn btn-sm btn-icon"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body terminal-body">
+                        <div class="log-console" id="logConsole">
+                            <div class="log-line log-info">[SYSTEM] LwM2M Studio Ready. Connect to serial port or run with --demo flag.</div>
+                        </div>
+                        <div class="terminal-input-bar">
+                            <span class="prompt">AT></span>
+                            <input type="text" id="atInput" placeholder='Enter LwM2M AT Command (e.g. AT+QLWM2M="register")...' autocomplete="off">
+                            <button id="sendAtBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane"></i> Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

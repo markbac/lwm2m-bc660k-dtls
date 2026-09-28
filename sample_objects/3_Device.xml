@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
+  <Object ObjectType="MODefinition">
+    <Name>Device</Name>
+    <Description1>This LwM2M Object provides device information.</Description1>
+    <ObjectID>3</ObjectID>
+    <ObjectURN>urn:oma:lwm2m:oma:3</ObjectURN>
+    <MultipleInstances>Single</MultipleInstances>
+    <Mandatory>Mandatory</Mandatory>
+    <Resources>
+      <Item ID="0">
+        <Name>Manufacturer</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>String</Type>
+        <Description>Human readable manufacturer name.</Description>
+      </Item>
+      <Item ID="1">
+        <Name>Model Number</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>String</Type>
+        <Description>Model name or number.</Description>
+      </Item>
+      <Item ID="2">
+        <Name>Serial Number</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>String</Type>
+        <Description>Serial number of device.</Description>
+      </Item>
+      <Item ID="3">
+        <Name>Firmware Version</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>String</Type>
+        <Description>Current firmware version.</Description>
+      </Item>
+    </Resources>
+  </Object>
+</LWM2M>
